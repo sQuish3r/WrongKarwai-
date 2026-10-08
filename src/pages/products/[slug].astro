@@ -1,0 +1,77 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Hazard from '../../components/Hazard.astro';
+import { categoryLabels, formatPrice, url } from '../../lib/catalog';
+
+export async function getStaticPaths() {
+  const products = await getCollection('products');
+  return products.map((product) => ({ params: { slug: product.id }, props: { product } }));
+}
+
+const { product } = Astro.props;
+const { name, price, hazardLevel, glyph, tagline, inStock, warnings, category } = product.data;
+const { Content } = await render(product);
+---
+
+<Layout title={name} description={tagline}>
+  <a href={url()} class="font-term text-xl hover:underline">&lt; НАЗАД В КАТАЛОГ</a>
+
+  <article class="slime-card mt-4 grid gap-8 p-6 md:grid-cols-[1fr_2fr]">
+    <div class="glyph flex items-center justify-center text-[9rem] leading-none" aria-hidden="true">{glyph}</div>
+
+    <div>
+      <p class="text-xs tracking-[0.3em] text-phosphor-dim">
+        {categoryLabels[category]} // АРТИКУЛ HD-{product.id.toUpperCase()}
+      </p>
+      <h2 class="glow font-term text-5xl leading-none">{name}</h2>
+      <p class="mt-2 text-phosphor-dim">{tagline}</p>
+
+      <div class="mt-4"><Hazard level={hazardLevel} /></div>
+
+      <div class="prose-term mt-6 space-y-3 leading-relaxed">
+        <Content />
+      </div>
+
+      {
+        warnings.length > 0 && (
+          <div class="mt-6 border border-amber p-3 text-sm text-amber">
+            <p class="font-term text-xl">⚠ ПРЕДУПРЕЖДЕНИЯ</p>
+            <ul class="mt-1 list-inside list-['>_']">
+              {warnings.map((w) => (
+                <li>{w}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      <div class="mt-6 flex flex-wrap items-center gap-4">
+        <span class="font-term text-4xl text-acid">{formatPrice(price)}</span>
+        {
+          inStock ? (
+            <button class="btn" data-add-to-cart data-slug={product.id} data-name={name} data-price={price}>
+              Погрузить в трюм
+            </button>
+          ) : (
+            <span class="text-blood">ТОВАР СБЕЖАЛ СО СКЛАДА. ЕСЛИ ВЫ ЕГО ВИДИТЕ — НЕ ДВИГАЙТЕСЬ.</span>
+          )
+        }
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .prose-term :global(strong) {
+    color: var(--color-acid);
+  }
+  .prose-term :global(em) {
+    color: var(--color-amber);
+  }
+</style>
+
+<script>
+  import { bindAddButtons } from '../../scripts/cart';
+  bindAddButtons();
+</script>

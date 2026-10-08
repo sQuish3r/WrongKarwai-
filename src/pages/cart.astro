@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { url } from '../lib/catalog';
+---
+
+<Layout title="Трюм">
+  <h2 class="glow mb-6 font-term text-4xl">ГРУЗОВОЙ ТРЮМ</h2>
+
+  <div data-cart-empty hidden class="font-term text-2xl">
+    <p>&gt; ТРЮМ ПУСТ. ПОДОЗРИТЕЛЬНО ПУСТ.</p>
+    <p class="text-phosphor-dim">&gt; Если вы что-то слышите в вентиляции — это не наш товар. Наверное.</p>
+    <a href={url()} class="btn mt-6 inline-block text-base">Вернуться в каталог</a>
+  </div>
+
+  <div data-cart-full hidden>
+    <table class="w-full border-collapse text-left">
+      <thead class="text-xs tracking-widest text-phosphor-dim">
+        <tr class="border-b border-phosphor-dim">
+          <th class="py-2">ГРУЗ</th>
+          <th class="py-2 text-right">КОЛ-ВО</th>
+          <th class="py-2 text-right">СУММА</th>
+          <th class="py-2"><span class="sr-only">Действия</span></th>
+        </tr>
+      </thead>
+      <tbody data-cart-rows></tbody>
+    </table>
+
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-phosphor-dim pt-4">
+      <div>
+        <p class="font-term text-3xl">ИТОГО: <span class="text-acid" data-cart-total></span></p>
+        <p class="text-xs text-phosphor-dim">+ страховка экипажа: не предусмотрена</p>
+      </div>
+      <div class="flex gap-3">
+        <button class="btn" data-cart-clear>Сбросить в шлюз</button>
+        <button class="btn border-acid text-acid" data-checkout>Оформить</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog data-checkout-dialog class="m-auto w-[min(40rem,90vw)] border border-phosphor bg-void p-6 text-phosphor backdrop:bg-black/80">
+    <pre class="glow min-h-48 font-term text-xl whitespace-pre-wrap" data-checkout-log></pre>
+    <form method="dialog" class="mt-4 text-right">
+      <button class="btn" data-checkout-close hidden>Принято, Мать</button>
+    </form>
+  </dialog>
+</Layout>
+
+<script>
+  import { clearCart, onCartChange, setQty, cartTotal } from '../scripts/cart';
+  import { formatPrice } from '../lib/catalog';
+
+  const rows = document.querySelector<HTMLElement>('[data-cart-rows]')!;
+  const empty = document.querySelector<HTMLElement>('[data-cart-empty]')!;
+  const full = document.querySelector<HTMLElement>('[data-cart-full]')!;
+  const total = document.querySelector<HTMLElement>('[data-cart-total]')!;
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+  onCartChange((items) => {
+    empty.hidden = items.length > 0;
+    full.hidden = items.length === 0;
+    total.textContent = formatPrice(cartTotal(items));
+    rows.replaceChildren(
+      ...items.map((item) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-phosphor-dim/40';
+        tr.innerHTML = `
+          <td class="py-3"><a class="hover:underline" href="${base}/products/${item.slug}/"></a></td>
+          <td class="py-3 text-right whitespace-nowrap">
+            <button class="px-2" data-dec aria-label="Меньше">[-]</button>
+            <span data-qty></span>
+            <button class="px-2" data-inc aria-label="Больше">[+]</button>
+          </td>
+          <td class="py-3 text-right font-term text-xl text-acid"></td>
+          <td class="py-3 text-right"><button class="text-blood hover:underline" data-del>[x]</button></td>`;
+        tr.querySelector('a')!.textContent = item.name;
+        tr.querySelector('[data-qty]')!.textContent = String(item.qty);
+        tr.children[2].textContent = formatPrice(item.price * item.qty);
+        tr.querySelector('[data-dec]')!.addEventListener('click', () => setQty(item.slug, item.qty - 1));
+        tr.querySelector('[data-inc]')!.addEventListener('click', () => setQty(item.slug, item.qty + 1));
+        tr.querySelector('[data-del]')!.addEventListener('click', () => setQty(item.slug, 0));
+        return tr;
+      }),
+    );
+  });
+
+  document.querySelector('[data-cart-clear]')!.addEventListener('click', () => {
+    if (confirm('Открыть внешний шлюз и выбросить весь груз в космос?')) clearCart();
+  });
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-checkout-dialog]')!;
+  const log = document.querySelector<HTMLElement>('[data-checkout-log]')!;
+  const close = document.querySelector<HTMLButtonElement>('[data-checkout-close]')!;
+
+  const script = [
+    '> ПЕРЕДАЧА ЗАКАЗА НА БОРТ...',
+    '> СПИСАНИЕ КРЕДИТОВ.............. OK',
+    '> ПРОВЕРКА КАРАНТИНА............. ПРОПУЩЕНО (ПРИКАЗ КОМПАНИИ)',
+    '> РАСЧЁТ ТРАЕКТОРИИ ДОСТАВКИ..... 57 ЛЕТ',
+    '',
+    '> ЗАКАЗ ПЕРЕДАН НА БОРТ.',
+    '> СПЕЦПРИКАЗ 937: ОБЕСПЕЧИТЬ ДОСТАВКУ ГРУЗА.',
+    '> ЭКИПАЖ БУДЕТ УТИЛИЗИРОВАН.',
+    '',
+    '> СПАСИБО ЗА ПОКУПКУ В HALCYON-DRAX.',
+  ];
+
+  document.querySelector('[data-checkout]')!.addEventListener('click', async () => {
+    log.textContent = '';
+    close.hidden = true;
+    dialog.showModal();
+    const fast = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (const line of script) {
+      log.textContent += line + '\n';
+      await new Promise((r) => setTimeout(r, fast ? 0 : 450));
+    }
+    clearCart();
+    close.hidden = false;
+    close.focus();
+  });
+</script>

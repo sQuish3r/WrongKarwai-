@@ -1,0 +1,62 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { categoryLabels } from '../lib/catalog';
+
+const products = (await getCollection('products')).sort((a, b) => a.data.name.localeCompare(b.data.name, 'ru'));
+const categories = Object.entries(categoryLabels).filter(([key]) => products.some((p) => p.data.category === key));
+---
+
+<Layout>
+  <section class="mb-8 font-term text-xl leading-snug">
+    <p>&gt; ИНИЦИАЛИЗАЦИЯ ТОРГОВОГО МОДУЛЯ............ OK</p>
+    <p>&gt; ПРОВЕРКА ГЕРМЕТИЧНОСТИ СКЛАДА.............. <span class="text-amber">СОМНИТЕЛЬНО</span></p>
+    <p>&gt; ПОЗИЦИЙ В КАТАЛОГЕ: {products.length}. ПОЗИЦИЙ, ПЫТАВШИХСЯ СБЕЖАТЬ: {products.filter((p) => !p.data.inStock).length}</p>
+    <p>&gt; ДОБРО ПОЖАЛОВАТЬ, ЧЛЕН ЭКИПАЖА. ВАША ЖИЗНЬ ЗАСТРАХОВАНА В ПОЛЬЗУ КОМПАНИИ<span class="blink">█</span></p>
+  </section>
+
+  <div class="mb-6 flex flex-wrap gap-2" role="toolbar" aria-label="Фильтр по категориям">
+    <button class="btn text-xs" data-filter="all" aria-pressed="true">ВСЁ</button>
+    {
+      categories.map(([key, label]) => (
+        <button class="btn text-xs" data-filter={key} aria-pressed="false">
+          {label}
+        </button>
+      ))
+    }
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    {
+      products.map((p) => (
+        <div data-category={p.data.category}>
+          <ProductCard product={p} />
+        </div>
+      ))
+    }
+  </div>
+</Layout>
+
+<style>
+  [aria-pressed='true'] {
+    background: var(--color-phosphor);
+    color: var(--color-void);
+  }
+</style>
+
+<script>
+  import { bindAddButtons } from '../scripts/cart';
+  bindAddButtons();
+
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  buttons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      const f = btn.dataset.filter;
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      document.querySelectorAll<HTMLElement>('[data-category]').forEach((el) => {
+        el.hidden = f !== 'all' && el.dataset.category !== f;
+      });
+    }),
+  );
+</script>

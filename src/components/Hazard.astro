@@ -1,0 +1,14 @@
+---
+import { hazardLabels } from '../lib/catalog';
+
+interface Props {
+  level: number;
+}
+
+const { level } = Astro.props;
+---
+
+<span class={`hazard-${level} whitespace-nowrap`} title={`Уровень опасности ${level}/5`}>
+  {'▲'.repeat(level)}<span class="opacity-25">{'▲'.repeat(5 - level)}</span>
+  <span class="ml-1 text-xs">{hazardLabels[level]}</span>
+</span>

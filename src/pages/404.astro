@@ -1,0 +1,14 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { url } from '../lib/catalog';
+---
+
+<Layout title="404">
+  <div class="font-term text-2xl leading-snug">
+    <p class="glow text-6xl">ОШИБКА 404</p>
+    <p class="mt-4">&gt; ЗАПРОШЕННЫЙ ОТСЕК НЕ НАЙДЕН.</p>
+    <p>&gt; ВОЗМОЖНО, ОН РАСТВОРЁН КИСЛОТОЙ.</p>
+    <p>&gt; ВОЗМОЖНО, ВЫ В НЁМ, А ОН В ВАС.<span class="blink">█</span></p>
+    <a href={url()} class="btn mt-8 inline-block text-base">Вернуться в каталог</a>
+  </div>
+</Layout>
