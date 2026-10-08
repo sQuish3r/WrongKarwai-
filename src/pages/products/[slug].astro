@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import Hazard from '../../components/Hazard.astro';
+import Relic from '../../components/Relic.astro';
 import { categoryLabels, formatPrice, url } from '../../lib/catalog';
 
 export async function getStaticPaths() {
@@ -17,15 +18,15 @@ const { Content } = await render(product);
 <Layout title={name} description={tagline}>
   <a href={url()} class="font-term text-xl hover:underline">&lt; НАЗАД В КАТАЛОГ</a>
 
-  <article class="slime-card mt-4 grid gap-8 p-6 md:grid-cols-[1fr_2fr]">
-    <div class="glyph flex items-center justify-center text-[9rem] leading-none" aria-hidden="true">{glyph}</div>
+  <article class="relic-card mt-4 grid items-center gap-8 p-6 md:grid-cols-[2fr_3fr]">
+    <Relic id={product.id} glyph={glyph} hazard={hazardLevel} size="hero" />
 
     <div>
-      <p class="text-xs tracking-[0.3em] text-phosphor-dim">
+      <p class="holo-glow text-xs tracking-[0.3em] text-holo" data-scramble>
         {categoryLabels[category]} // АРТИКУЛ HD-{product.id.toUpperCase()}
       </p>
-      <h2 class="glow font-term text-5xl leading-none">{name}</h2>
-      <p class="mt-2 text-phosphor-dim">{tagline}</p>
+      <h2 class="glow mt-1 font-display text-3xl leading-tight text-spice uppercase sm:text-4xl" data-scramble>{name}</h2>
+      <p class="mt-2 text-dust">{tagline}</p>
 
       <div class="mt-4"><Hazard level={hazardLevel} /></div>
 
@@ -47,7 +48,7 @@ const { Content } = await render(product);
       }
 
       <div class="mt-6 flex flex-wrap items-center gap-4">
-        <span class="font-term text-4xl text-acid">{formatPrice(price)}</span>
+        <span class="glow font-term text-5xl text-spice">{formatPrice(price)}</span>
         {
           inStock ? (
             <button class="btn" data-add-to-cart data-slug={product.id} data-name={name} data-price={price}>
@@ -64,7 +65,7 @@ const { Content } = await render(product);
 
 <style>
   .prose-term :global(strong) {
-    color: var(--color-acid);
+    color: var(--color-spice);
   }
   .prose-term :global(em) {
     color: var(--color-amber);

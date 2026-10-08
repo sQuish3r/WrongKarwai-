@@ -10,10 +10,10 @@ const categories = Object.entries(categoryLabels).filter(([key]) => products.som
 
 <Layout>
   <section class="mb-8 font-term text-xl leading-snug">
-    <p>&gt; ИНИЦИАЛИЗАЦИЯ ТОРГОВОГО МОДУЛЯ............ OK</p>
-    <p>&gt; ПРОВЕРКА ГЕРМЕТИЧНОСТИ СКЛАДА.............. <span class="text-amber">СОМНИТЕЛЬНО</span></p>
-    <p>&gt; ПОЗИЦИЙ В КАТАЛОГЕ: {products.length}. ПОЗИЦИЙ, ПЫТАВШИХСЯ СБЕЖАТЬ: {products.filter((p) => !p.data.inStock).length}</p>
-    <p>&gt; ДОБРО ПОЖАЛОВАТЬ, ЧЛЕН ЭКИПАЖА. ВАША ЖИЗНЬ ЗАСТРАХОВАНА В ПОЛЬЗУ КОМПАНИИ<span class="blink">█</span></p>
+    <p>&gt; <span data-scramble>ИНИЦИАЛИЗАЦИЯ ТОРГОВОГО АЛТАРЯ............ OK</span></p>
+    <p>&gt; <span data-scramble>ПРОВЕРКА ГЕРМЕТИЧНОСТИ СКЛАДА..............</span> <span class="text-amber">СОМНИТЕЛЬНО</span></p>
+    <p>&gt; <span data-scramble>ПОЗИЦИЙ В КАТАЛОГЕ: {products.length}. ПОЗИЦИЙ, ПЫТАВШИХСЯ СБЕЖАТЬ: {products.filter((p) => !p.data.inStock).length}</span></p>
+    <p class="holo-glow text-holo">&gt; <span data-scramble>ВЫЧИСЛИТЕЛЬ ВИДИТ ВАС. ВЫЧИСЛИТЕЛЬ ОДОБРЯЕТ ВАШУ ПОКУПКУ ЗАРАНЕЕ</span><span class="blink">█</span></p>
   </section>
 
   <div class="mb-6 flex flex-wrap gap-2" role="toolbar" aria-label="Фильтр по категориям">
@@ -30,7 +30,7 @@ const categories = Object.entries(categoryLabels).filter(([key]) => products.som
   <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
     {
       products.map((p) => (
-        <div data-category={p.data.category}>
+        <div data-category={p.data.category} class="h-full">
           <ProductCard product={p} />
         </div>
       ))
@@ -40,12 +40,13 @@ const categories = Object.entries(categoryLabels).filter(([key]) => products.som
 
 <style>
   [aria-pressed='true'] {
-    background: var(--color-phosphor);
+    background: var(--color-spice);
     color: var(--color-void);
   }
 </style>
 
 <script>
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
   import { bindAddButtons } from '../scripts/cart';
   bindAddButtons();
 
@@ -57,6 +58,8 @@ const categories = Object.entries(categoryLabels).filter(([key]) => products.som
       document.querySelectorAll<HTMLElement>('[data-category]').forEach((el) => {
         el.hidden = f !== 'all' && el.dataset.category !== f;
       });
+      // раскладка поменялась — пересчитать, какие карточки пора выкапывать
+      ScrollTrigger.refresh();
     }),
   );
 </script>

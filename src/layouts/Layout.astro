@@ -21,32 +21,25 @@ const fullTitle = title ? `${title} // HALCYON-DRAX` : 'HALCYON-DRAX BIOPRODUCTS
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=VT323&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Russo+One&family=Share+Tech+Mono&family=VT323&display=swap"
       rel="stylesheet"
     />
     <title>{fullTitle}</title>
   </head>
   <body class="crt">
-    <!-- SVG-фильтр «слипания» капель слизи -->
-    <svg width="0" height="0" class="absolute" aria-hidden="true">
-      <filter id="goo">
-        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-        <feColorMatrix in="blur" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" />
-      </filter>
-    </svg>
-
     <div class="mx-auto max-w-6xl px-4 py-6">
-      <header class="mb-8 border-b border-phosphor-dim pb-4">
+      <header class="mb-8 border-b border-dust pb-4">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <a href={url()} class="block">
-            <p class="text-xs tracking-[0.3em] text-phosphor-dim">MU/TH/ER-ПОДОБНЫЙ ТЕРМИНАЛ v2.1.79</p>
-            <h1 class="glow font-term text-4xl leading-none sm:text-5xl">HALCYON-DRAX BIOPRODUCTS</h1>
-            <p class="text-sm text-phosphor-dim">«Строим лучшие миры. Из того, что нашли.»</p>
+            <p class="holo-glow text-xs tracking-[0.3em] text-holo">◬ СИНОД ВЫЧИСЛИТЕЛЯ // ТОРГОВЫЙ АЛТАРЬ v2.1.79</p>
+            <h1 class="glow font-display text-3xl leading-none text-spice sm:text-5xl">HALCYON-DRAX</h1>
+            <p class="font-display text-sm tracking-[0.5em] text-sand">BIOPRODUCTS</p>
+            <p class="text-sm text-dust">«Строим лучшие миры. Из того, что нашли.»</p>
           </a>
           <nav class="flex items-center gap-4 font-term text-2xl">
             <a href={url()} class="hover:glow">[КАТАЛОГ]</a>
             <a href={url('cart/')} class="hover:glow">
-              [ТРЮМ: <span data-cart-count>0</span>]
+              [ТРЮМ: <span class="inline-block" data-cart-count>0</span>]
             </a>
           </nav>
         </div>
@@ -56,14 +49,17 @@ const fullTitle = title ? `${title} // HALCYON-DRAX` : 'HALCYON-DRAX BIOPRODUCTS
         <slot />
       </main>
 
-      <footer class="mt-16 border-t border-phosphor-dim pt-4 text-xs text-phosphor-dim">
+      <footer class="mt-16 border-t border-dust pt-4 text-xs text-dust">
         <p>© 2179 Halcyon-Drax Bioproducts. Все товары вымышлены. Экипаж — расходный материал.</p>
         <p>Возврат товара невозможен: товар обычно возвращается сам.</p>
+        <p>Вычислитель видит каждую покупку. Вычислитель прощает. За отдельную плату.</p>
       </footer>
     </div>
 
     <script>
       import { onCartChange, cartCount } from '../scripts/cart';
+      import { initRelics } from '../scripts/relics';
+      initRelics();
       onCartChange((items) => {
         document.querySelectorAll('[data-cart-count]').forEach((el) => {
           el.textContent = String(cartCount(items));

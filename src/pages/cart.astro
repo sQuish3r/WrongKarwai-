@@ -8,14 +8,14 @@ import { url } from '../lib/catalog';
 
   <div data-cart-empty hidden class="font-term text-2xl">
     <p>&gt; ТРЮМ ПУСТ. ПОДОЗРИТЕЛЬНО ПУСТ.</p>
-    <p class="text-phosphor-dim">&gt; Если вы что-то слышите в вентиляции — это не наш товар. Наверное.</p>
+    <p class="text-dust">&gt; Если вы что-то слышите в вентиляции — это не наш товар. Наверное.</p>
     <a href={url()} class="btn mt-6 inline-block text-base">Вернуться в каталог</a>
   </div>
 
   <div data-cart-full hidden>
     <table class="w-full border-collapse text-left">
-      <thead class="text-xs tracking-widest text-phosphor-dim">
-        <tr class="border-b border-phosphor-dim">
+      <thead class="text-xs tracking-widest text-dust">
+        <tr class="border-b border-dust">
           <th class="py-2">ГРУЗ</th>
           <th class="py-2 text-right">КОЛ-ВО</th>
           <th class="py-2 text-right">СУММА</th>
@@ -25,19 +25,19 @@ import { url } from '../lib/catalog';
       <tbody data-cart-rows></tbody>
     </table>
 
-    <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-phosphor-dim pt-4">
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-dust pt-4">
       <div>
-        <p class="font-term text-3xl">ИТОГО: <span class="text-acid" data-cart-total></span></p>
-        <p class="text-xs text-phosphor-dim">+ страховка экипажа: не предусмотрена</p>
+        <p class="font-term text-3xl">ИТОГО: <span class="text-spice" data-cart-total></span></p>
+        <p class="text-xs text-dust">+ страховка экипажа: не предусмотрена</p>
       </div>
       <div class="flex gap-3">
         <button class="btn" data-cart-clear>Сбросить в шлюз</button>
-        <button class="btn border-acid text-acid" data-checkout>Оформить</button>
+        <button class="btn border-spice text-spice" data-checkout>Оформить</button>
       </div>
     </div>
   </div>
 
-  <dialog data-checkout-dialog class="m-auto w-[min(40rem,90vw)] border border-phosphor bg-void p-6 text-phosphor backdrop:bg-black/80">
+  <dialog data-checkout-dialog class="m-auto w-[min(40rem,90vw)] border border-sand bg-void p-6 text-sand backdrop:bg-black/80">
     <pre class="glow min-h-48 font-term text-xl whitespace-pre-wrap" data-checkout-log></pre>
     <form method="dialog" class="mt-4 text-right">
       <button class="btn" data-checkout-close hidden>Принято, Мать</button>
@@ -62,7 +62,7 @@ import { url } from '../lib/catalog';
     rows.replaceChildren(
       ...items.map((item) => {
         const tr = document.createElement('tr');
-        tr.className = 'border-b border-phosphor-dim/40';
+        tr.className = 'border-b border-dust/40';
         tr.innerHTML = `
           <td class="py-3"><a class="hover:underline" href="${base}/products/${item.slug}/"></a></td>
           <td class="py-3 text-right whitespace-nowrap">
@@ -70,7 +70,7 @@ import { url } from '../lib/catalog';
             <span data-qty></span>
             <button class="px-2" data-inc aria-label="Больше">[+]</button>
           </td>
-          <td class="py-3 text-right font-term text-xl text-acid"></td>
+          <td class="py-3 text-right font-term text-xl text-spice"></td>
           <td class="py-3 text-right"><button class="text-blood hover:underline" data-del>[x]</button></td>`;
         tr.querySelector('a')!.textContent = item.name;
         tr.querySelector('[data-qty]')!.textContent = String(item.qty);

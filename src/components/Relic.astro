@@ -1,0 +1,126 @@
+---
+/**
+ * Реликварий товара: стрельчатая арка, за ней пустыня с распиленным солнцем и двумя лунами,
+ * священный треугольник с машинным глазом, вращающийся нимб с литанией и левитирующая реликвия.
+ * Сцена статична без JS — оживляет её src/scripts/relics.ts.
+ */
+interface Props {
+  id: string;
+  glyph: string;
+  hazard: number;
+  size?: 'card' | 'hero';
+}
+
+const { id, glyph, hazard, size = 'card' } = Astro.props;
+const uid = `r-${id}`;
+const sku = `HD-${id.toUpperCase()}`;
+
+// Детерминированный псевдослучайный генератор — у каждого товара своя пыль
+let seed = [...id].reduce((s, c) => (s * 31 + c.charCodeAt(0)) >>> 0, 7);
+const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
+const dust = Array.from({ length: 18 }, () => ({
+  x: rand() * 200,
+  y: 120 + rand() * 70,
+  r: 0.5 + rand() * 1.3,
+  o: 0.3 + rand() * 0.6,
+}));
+
+const litany = `✶ СИНОД ВЫЧИСЛИТЕЛЯ ✶ ОСВЯЩЕНО ✶ ${sku} ✶ ДА НЕ УСОМНИШЬСЯ В АЛГОРИТМЕ `;
+const arch = 'M24,198 V92 A76,76 0 0 1 176,92 V198 Z';
+---
+
+<div
+  class="relic"
+  data-relic
+  data-hazard={hazard}
+  style={size === 'hero' ? '--glyph-size: clamp(4.5rem, 12vw, 7rem); max-width: 26rem' : 'max-width: 15rem'}
+>
+  <svg class="relic-svg" viewBox="0 0 200 200" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${uid}-sky`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#1a0d07" />
+        <stop offset="0.55" stop-color="#4a1d0a" />
+        <stop offset="1" stop-color="#b8521a" />
+      </linearGradient>
+      <linearGradient id={`${uid}-sun`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffd27a" />
+        <stop offset="1" stop-color="#ff5a1a" />
+      </linearGradient>
+      <linearGradient id={`${uid}-scan`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#5ef0ff" stop-opacity="0" />
+        <stop offset="0.5" stop-color="#5ef0ff" stop-opacity="0.55" />
+        <stop offset="1" stop-color="#5ef0ff" stop-opacity="0" />
+      </linearGradient>
+      <!-- Солнце, распиленное на полосы, как в ретрофутуризме -->
+      <mask id={`${uid}-cuts`}>
+        <rect x="0" y="0" width="200" height="200" fill="#fff" />
+        <rect x="0" y="122" width="200" height="2" fill="#000" />
+        <rect x="0" y="130" width="200" height="3" fill="#000" />
+        <rect x="0" y="139" width="200" height="4" fill="#000" />
+        <rect x="0" y="149" width="200" height="5" fill="#000" />
+      </mask>
+      <clipPath id={`${uid}-arch`}>
+        <path d={arch} />
+      </clipPath>
+      <path id={`${uid}-halo`} d="M100,95 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0" />
+    </defs>
+
+    <g clip-path={`url(#${uid}-arch)`}>
+      <rect width="200" height="200" fill={`url(#${uid}-sky)`} />
+      <circle class="relic-moon" cx="52" cy="58" r="6" fill="#f3e3c4" opacity="0.8" />
+      <circle class="relic-moon" cx="64" cy="48" r="3" fill="#f3e3c4" opacity="0.6" />
+      <circle class="relic-sun" cx="100" cy="140" r="44" fill={`url(#${uid}-sun)`} mask={`url(#${uid}-cuts)`} />
+      <path
+        class="relic-dune-back"
+        d="M-40,170 C0,150 30,152 60,162 S120,140 160,156 S220,150 240,160 V200 H-40 Z"
+        fill="#5a2a12"
+      />
+      <path
+        class="relic-dune-front"
+        d="M-40,184 C-10,170 30,176 70,182 S140,168 180,178 S230,176 240,182 V200 H-40 Z"
+        fill="#24120a"
+      />
+      <g class="relic-dust" fill="#ffd9a0">
+        {dust.map((d) => <circle cx={d.x} cy={d.y} r={d.r} opacity={d.o} />)}
+      </g>
+      <rect class="relic-scan" x="0" y="-24" width="200" height="22" fill={`url(#${uid}-scan)`} />
+    </g>
+
+    <!-- Священная геометрия машинного культа -->
+    <g class="relic-sigil" fill="none" stroke="#5ef0ff" stroke-width="0.8" opacity="0.55">
+      <path d="M100,34 L156,130 L44,130 Z" />
+      <path d="M100,150 L44,54 L156,54 Z" opacity="0.4" />
+      <g class="relic-eye">
+        <path d="M86,48 Q100,38 114,48 Q100,58 86,48 Z" fill="#0b0705" />
+        <circle class="relic-iris" cx="100" cy="48" r="3.2" fill="#5ef0ff" stroke="none" />
+      </g>
+    </g>
+
+    <!-- Нимб: литания по кругу и шкала-шестерня -->
+    <g class="relic-ticks">
+      <circle cx="100" cy="95" r="70" fill="none" stroke="#e8c48f" stroke-width="5" stroke-dasharray="1 5" opacity="0.35" />
+    </g>
+    <g class="relic-halo">
+      <text font-size="7.4" letter-spacing="1.2" fill="#e8c48f" opacity="0.85" font-family="Share Tech Mono, monospace">
+        <textPath href={`#${uid}-halo`}>{litany}</textPath>
+      </text>
+    </g>
+
+    <!-- Ржавая рама арки с заклёпками -->
+    <path d={arch} fill="none" stroke="#8a3b12" stroke-width="5" />
+    <path d={arch} fill="none" stroke="#ff7a1a" stroke-width="0.8" opacity="0.7" />
+    <g fill="#c58a52">
+      <circle cx="24" cy="110" r="2" />
+      <circle cx="24" cy="186" r="2" />
+      <circle cx="176" cy="110" r="2" />
+      <circle cx="176" cy="186" r="2" />
+      <circle cx="100" cy="16" r="2.4" />
+    </g>
+  </svg>
+
+  <div class="relic-glyph-wrap" aria-hidden="true">
+    <span class="relic-ghost relic-ghost-c">{glyph}</span>
+    <span class="relic-ghost relic-ghost-r">{glyph}</span>
+    <span class="relic-glyph">{glyph}</span>
+  </div>
+</div>
